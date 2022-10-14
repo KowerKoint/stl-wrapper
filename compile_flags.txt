@@ -1,0 +1,8 @@
+-g
+-ftrapv
+-I.
+-I./library
+-I./ac-library
+-DDEBUG
+-std=gnu++17
+-O2
