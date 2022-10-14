@@ -7,8 +7,8 @@
 #include <unordered_set>
 #include "vector.hpp"
 
-template <typename T, typename Hash = std::hash<T>, typename KeyEqual = std::equal_to<T>, typename Allocator = std::allocator<T>>
-struct UnorderedSet : public __gnu_pbds::gp_hash_table<T, __gnu_pbds::null_type, Hash, KeyEqual, Allocator> {
+template <typename T, typename Hash = std::hash<T>, typename KeyEqual = std::equal_to<T>>
+struct UnorderedSet : public __gnu_pbds::gp_hash_table<T, __gnu_pbds::null_type, Hash, KeyEqual> {
     UnorderedSet& operator&=(const UnorderedSet& other) {
         for (auto it = this->begin(); it != this->end();) {
             if (other.find(*it) == other.end()) it = this->erase(it);
@@ -55,8 +55,8 @@ struct UnorderedSet : public __gnu_pbds::gp_hash_table<T, __gnu_pbds::null_type,
         return os;
     }
 };
-template <typename T, typename Hash = std::hash<T>, typename KeyEqual = std::equal_to<T>, typename Allocator = std::allocator<T>>
-struct UnorderedMultiSet : std::unordered_multiset<T, Hash, KeyEqual, Allocator> {
+template <typename T, typename Hash = std::hash<T>, typename KeyEqual = std::equal_to<T>>
+struct UnorderedMultiSet : std::unordered_multiset<T, Hash, KeyEqual> {
     UnorderedMultiSet operator+=(const UnorderedMultiSet& other) {
         for (auto it = other.begin(); it != other.end(); ++it) {
             this->insert(*it);
@@ -85,9 +85,9 @@ struct UnorderedMultiSet : std::unordered_multiset<T, Hash, KeyEqual, Allocator>
     }
 };
 namespace std {
-    template<typename T, typename Hash, typename KeyEqual, typename Allocator>
-    struct hash<UnorderedSet<T, Hash, KeyEqual, Allocator>> {
-        size_t operator()(const UnorderedSet<T, Hash, KeyEqual, Allocator>& set) const {
+    template<typename T, typename Hash, typename KeyEqual>
+    struct hash<UnorderedSet<T, Hash, KeyEqual>> {
+        size_t operator()(const UnorderedSet<T, Hash, KeyEqual>& set) const {
             Vector<T> vec(set.begin(), set.end());
             sort(vec.begin(), vec.end());
             return hash<Vector<T>>()(vec);

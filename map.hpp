@@ -5,8 +5,8 @@
 #include <ext/pb_ds/tree_policy.hpp>
 #include "vector.hpp"
 
-template <typename Key, typename Value, typename Compare = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, Value>>>
-struct Map : __gnu_pbds::tree<Key, Value, Compare, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update, Allocator> {
+template <typename Key, typename Value, typename Compare = std::less<Key>>
+struct Map : __gnu_pbds::tree<Key, Value, Compare, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update> {
     Map& operator&=(const Map& other) {
         for (auto it = this->begin(); it != this->end(); ) {
             if (other.find(it->first) == other.end()) {
@@ -67,8 +67,8 @@ namespace _map_util {
         }
     };
 }
-template <typename Key, typename Value, typename Compare = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, Value>>>
-struct MultiMap : __gnu_pbds::tree<Key, Value, _map_util::CompareEqual<Key, Compare>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update, Allocator> {
+template <typename Key, typename Value, typename Compare = std::less<Key>>
+struct MultiMap : __gnu_pbds::tree<Key, Value, _map_util::CompareEqual<Key, Compare>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update> {
     MultiMap& operator+=(const MultiMap& other) {
         for (auto it = other.begin(); it != other.end(); ++it) {
             this->insert(*it);
@@ -99,16 +99,16 @@ struct MultiMap : __gnu_pbds::tree<Key, Value, _map_util::CompareEqual<Key, Comp
 };
 
 namespace std {
-    template <typename Key, typename Value, typename Compare, typename Allocator>
-    struct hash<Map<Key, Value, Compare, Allocator>> {
-        size_t operator()(const Map<Key, Value, Compare, Allocator>& map) const {
+    template <typename Key, typename Value, typename Compare>
+    struct hash<Map<Key, Value, Compare>> {
+        size_t operator()(const Map<Key, Value, Compare>& map) const {
             Vector<pair<Key, Value>> v(map.begin(), map.end());
             return hash<Vector<pair<Key, Value>>>()(v);
         }
     };
-    template <typename Key, typename Value, typename Compare, typename Allocator>
-    struct hash<MultiMap<Key, Value, Compare, Allocator>> {
-        size_t operator()(const Map<Key, Value, Compare, Allocator>& map) const {
+    template <typename Key, typename Value, typename Compare>
+    struct hash<MultiMap<Key, Value, Compare>> {
+        size_t operator()(const Map<Key, Value, Compare>& map) const {
             Vector<pair<Key, Value>> v(map.begin(), map.end());
             return hash<Vector<pair<Key, Value>>>()(v);
         }

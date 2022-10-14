@@ -5,8 +5,8 @@
 #include <ext/pb_ds/tree_policy.hpp>
 #include "vector.hpp"
 
-template <typename T, typename Compare = std::less<T>, typename Allocator = std::allocator<T>>
-struct Set : public __gnu_pbds::tree<T, __gnu_pbds::null_type, Compare, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update, Allocator> {
+template <typename T, typename Compare = std::less<T>>
+struct Set : public __gnu_pbds::tree<T, __gnu_pbds::null_type, Compare, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update> {
     Set& operator&=(const Set& other) {
         Set result;
         std::set_intersection(this->begin(), this->end(), other.begin(), other.end(), std::inserter(result, result.begin()));
@@ -57,8 +57,8 @@ namespace _set_util {
         }
     };
 }
-template <typename T, typename Compare = std::less<T>, typename Allocator = std::allocator<T>>
-struct MultiSet : public __gnu_pbds::tree<T, __gnu_pbds::null_type, _set_util::CompareEqual<T, Compare>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update, Allocator> {
+template <typename T, typename Compare = std::less<T>>
+struct MultiSet : public __gnu_pbds::tree<T, __gnu_pbds::null_type, _set_util::CompareEqual<T, Compare>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update> {
     MultiSet& operator+=(const MultiSet& other) {
         this->insert(other.begin(), other.end());
         return *this;
@@ -85,16 +85,16 @@ struct MultiSet : public __gnu_pbds::tree<T, __gnu_pbds::null_type, _set_util::C
     }
 };
 namespace std {
-    template <typename T, typename Compare, typename Allocator>
-    struct hash<Set<T, Compare, Allocator>> {
-        size_t operator()(const Set<T, Compare, Allocator>& set) const {
+    template <typename T, typename Compare>
+    struct hash<Set<T, Compare>> {
+        size_t operator()(const Set<T, Compare>& set) const {
             Vector<T> vec(set.begin(), set.end());
             return hash<Vector<T>>()(vec);
         }
     };
-    template <typename T, typename Compare, typename Allocator>
-    struct hash<MultiSet<T, Compare, Allocator>> {
-        size_t operator()(const MultiSet<T, Compare, Allocator>& set) const {
+    template <typename T, typename Compare>
+    struct hash<MultiSet<T, Compare>> {
+        size_t operator()(const MultiSet<T, Compare>& set) const {
             Vector<T> vec(set.begin(), set.end());
             return hash<Vector<T>>()(vec);
         }
