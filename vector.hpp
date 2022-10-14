@@ -5,6 +5,17 @@
 
 template <typename T, typename Allocator = std::allocator<T>>
 struct Vector : std::vector<T, Allocator> {
+    Vector() noexcept(noexcept(Allocator())) : std::vector<T, Allocator>(Allocator()) {}
+    explicit Vector(const Allocator& alloc) noexcept : std::vector<T, Allocator>(alloc) {}
+    explicit Vector(size_t count, const Allocator& alloc = Allocator()) : std::vector<T, Allocator>(count, T(), alloc) {}
+    Vector(size_t count, const T& value, const Allocator& alloc = Allocator()) : std::vector<T, Allocator>(count, value, alloc) {}
+    template <typename InputIt>
+    Vector(InputIt first, InputIt last, const Allocator& alloc = Allocator()) : std::vector<T, Allocator>(first, last, alloc) {}
+    Vector(const Vector& other) : std::vector<T, Allocator>(other) {}
+    Vector(Vector&& other) noexcept : std::vector<T, Allocator>(std::move(other)) {}
+    Vector(const Vector& other, const Allocator& alloc) : std::vector<T, Allocator>(other, alloc) {}
+    Vector(Vector&& other, const Allocator& alloc) : std::vector<T, Allocator>(std::move(other), alloc) {}
+    Vector(std::initializer_list<T> init, const Allocator& alloc = Allocator()) : std::vector<T, Allocator>(init, alloc) {}
     const T& operator[](std::size_t i) const {
         assert(i < this->size());
         return std::vector<T, Allocator>::operator[](i);

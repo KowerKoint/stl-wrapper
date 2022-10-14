@@ -3,7 +3,17 @@
 #include <utility>
 
 template <typename T1, typename T2>
-struct Pair : std::pair<T1, T2> {
+struct Pair : public std::pair<T1, T2> {
+    explicit constexpr Pair() : std::pair<T1, T2>() {}
+    explicit constexpr Pair(const T1& first, const T2& second) : std::pair<T1, T2>(first, second) {}
+    template <typename U1, typename U2>
+    explicit constexpr Pair(U1&& first, U2&& second) : std::pair<T1, T2>(std::forward<U1>(first), std::forward<U2>(second)) {}
+    template <typename U1, typename U2>
+    explicit constexpr Pair(const std::pair<U1, U2>& other) : std::pair<T1, T2>(other) {}
+    template <typename U1, typename U2>
+    explicit constexpr Pair(std::pair<U1, U2>&& other) : std::pair<T1, T2>(std::move(other)) {}
+    template <typename... Args1, typename... Args2>
+    explicit constexpr Pair(std::piecewise_construct_t, std::tuple<Args1...> first_args, std::tuple<Args2...> second_args) : std::pair<T1, T2>(std::piecewise_construct, first_args, second_args) {}
     friend std::istream& operator>>(std::istream& is, Pair& p) {
         return is >> p.first >> p.second;
     }

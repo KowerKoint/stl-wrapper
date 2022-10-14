@@ -7,46 +7,39 @@
 
 template <typename T, typename Compare = std::less<T>>
 struct Set : public __gnu_pbds::tree<T, __gnu_pbds::null_type, Compare, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update> {
-    Set& operator&=(const Set& other) {
-        Set result;
-        std::set_intersection(this->begin(), this->end(), other.begin(), other.end(), std::inserter(result, result.begin()));
-        this->swap(result);
-        return *this;
+    Set() : __gnu_pbds::tree<T, __gnu_pbds::null_type, Compare, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>() {}
+    explicit Set(const Compare& comp) : __gnu_pbds::tree<T, __gnu_pbds::null_type, Compare, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(comp) {}
+    template <typename It>
+    Set(It first, It last, const Compare& comp = Compare()) : __gnu_pbds::tree<T, __gnu_pbds::null_type, Compare, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(first, last, comp) {}
+    Set(const Set& other) : __gnu_pbds::tree<T, __gnu_pbds::null_type, Compare, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(other) {}
+    Set(Set&& other) : __gnu_pbds::tree<T, __gnu_pbds::null_type, Compare, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(std::move(other)) {}
+    Set(std::initializer_list<T> init, const Compare& comp = Compare()) : __gnu_pbds::tree<T, __gnu_pbds::null_type, Compare, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(init, comp) {}
+    typename Set::const_iterator cbegin() const { return this->begin(); }
+    typename Set::const_iterator cend() const { return this->end(); }
+    typename Set::const_reverse_iterator crbegin() const { return this->rbegin(); }
+    typename Set::const_reverse_iterator crend() const { return this->rend(); }
+    template <typename K>
+    std::pair<typename Set::iterator, typename Set::iterator> equal_range(const K& value) {
+        return std::make_pair(lower_bound(value), upper_bound(value));
     }
-    Set operator&(const Set& other) const {
-        return Set(*this) &= other;
+    template <typename K>
+    std::pair<typename Set::const_iterator, typename Set::const_iterator> equal_range(const K& value) const {
+        return std::make_pair(lower_bound(value), upper_bound(value));
     }
-    Set& operator|=(const Set& other) {
-        this->insert(other.begin(), other.end());
-        return *this;
+    template <typename K>
+    std::size_t count(const K& x) const { return this->find(x) != this->end(); }
+    decltype(Compare()) key_comp() const { return Compare(); }
+    template <typename... Args>
+    std::pair<typename Set::iterator, bool> emplace(Args&&... args) {
+        return this->insert(T(std::forward<Args>(args)...));
     }
-    Set operator|(const Set& other) const {
-        return Set(*this) |= other;
-    }
-    Set& operator^=(const Set& other) {
-        Set result;
-        std::set_symmetric_difference(this->begin(), this->end(), other.begin(), other.end(), std::inserter(result, result.begin()));
-        this->swap(result);
-        return *this;
-    }
-    Set operator^(const Set& other) const {
-        return Set(*this) ^= other;
-    }
-    Set& operator-=(const Set& other) {
-        Set result;
-        std::set_difference(this->begin(), this->end(), other.begin(), other.end(), std::inserter(result, result.begin()));
-        this->swap(result);
-        return *this;
-    }
-    Set operator-(const Set& other) const {
-        return Set(*this) -= other;
+    template <typename... Args>
+    typename Set::iterator emplace_hint(typename Set::const_iterator hint, Args&&... args) {
+        return this->insert(hint, T(std::forward<Args>(args)...));
     }
     friend std::ostream& operator<<(std::ostream& os, const Set& set) {
-        for(auto it = set.begin(); it != set.end(); ++it) {
-            if(it != set.begin()) os << ' ';
-            os << *it;
-        }
-        return os;
+        Vector<T> vector(set.begin(), set.end());
+        return os << vector;
     }
 };
 namespace _set_util {
@@ -59,29 +52,42 @@ namespace _set_util {
 }
 template <typename T, typename Compare = std::less<T>>
 struct MultiSet : public __gnu_pbds::tree<T, __gnu_pbds::null_type, _set_util::CompareEqual<T, Compare>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update> {
-    MultiSet& operator+=(const MultiSet& other) {
-        this->insert(other.begin(), other.end());
-        return *this;
+    MultiSet() : __gnu_pbds::tree<T, __gnu_pbds::null_type, _set_util::CompareEqual<T, Compare>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>() {}
+    explicit MultiSet(const Compare& comp) : __gnu_pbds::tree<T, __gnu_pbds::null_type, _set_util::CompareEqual<T, Compare>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(comp) {}
+    template <typename It>
+    MultiSet(It first, It last, const Compare& comp = Compare()) : __gnu_pbds::tree<T, __gnu_pbds::null_type, _set_util::CompareEqual<T, Compare>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(first, last, comp) {}
+    MultiSet(const MultiSet& other) : __gnu_pbds::tree<T, __gnu_pbds::null_type, _set_util::CompareEqual<T, Compare>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(other) {}
+    MultiSet(MultiSet&& other) : __gnu_pbds::tree<T, __gnu_pbds::null_type, _set_util::CompareEqual<T, Compare>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(std::move(other)) {}
+    MultiSet(std::initializer_list<T> init, const Compare& comp = Compare()) : __gnu_pbds::tree<T, __gnu_pbds::null_type, _set_util::CompareEqual<T, Compare>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(init, comp) {}
+    typename MultiSet::const_iterator cbegin() const { return this->begin(); }
+    typename MultiSet::const_iterator cend() const { return this->end(); }
+    typename MultiSet::const_reverse_iterator crbegin() const { return this->rbegin(); }
+    typename MultiSet::const_reverse_iterator crend() const { return this->rend(); }
+    template <typename K>
+    std::pair<typename MultiSet::iterator, typename MultiSet::iterator> equal_range(const K& value) {
+        return std::make_pair(lower_bound(value), upper_bound(value));
     }
-    MultiSet operator+(const MultiSet& other) const {
-        return MultiSet(*this) += other;
+    template <typename K>
+    std::pair<typename MultiSet::const_iterator, typename MultiSet::const_iterator> equal_range(const K& value) const {
+        return std::make_pair(lower_bound(value), upper_bound(value));
     }
-    MultiSet& operator-=(const MultiSet& other) {
-        for(auto it = other.begin(); it != other.end(); ++it) {
-            auto it2 = this->find(*it);
-            if(it2 != this->end()) this->erase(it2);
-        }
-        return *this;
+    template <typename K>
+    std::size_t count(const K& x) const {
+        auto range = equal_range(x);
+        return std::distance(range.first, range.second);
     }
-    MultiSet operator-(const MultiSet& other) const {
-        return MultiSet(*this) -= other;
+    decltype(Compare()) key_comp() const { return Compare(); }
+    template <typename... Args>
+    typename MultiSet::iterator emplace(Args&&... args) {
+        return this->insert(T(std::forward<Args>(args)...));
+    }
+    template <typename... Args>
+    typename MultiSet::iterator emplace_hint(typename MultiSet::const_iterator hint, Args&&... args) {
+        return this->insert(hint, T(std::forward<Args>(args)...));
     }
     friend std::ostream& operator<<(std::ostream& os, const MultiSet& set) {
-        for(auto it = set.begin(); it != set.end(); ++it) {
-            if(it != set.begin()) os << ' ';
-            os << *it;
-        }
-        return os;
+        Vector<T> vector(set.begin(), set.end());
+        return os << vector;
     }
 };
 namespace std {
