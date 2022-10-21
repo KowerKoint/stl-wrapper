@@ -5,15 +5,19 @@
 #include <ext/pb_ds/tree_policy.hpp>
 #include "vector.hpp"
 
+template <typename Key, typename Value, typename Compare>
+using pbds_map = __gnu_pbds::tree<Key, Value, Compare, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>;
+
 template <typename Key, typename Value, typename Compare = std::less<Key>>
-struct Map : __gnu_pbds::tree<Key, Value, Compare, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update> {
-    Map() : __gnu_pbds::tree<Key, Value, Compare, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>() {}
-    explicit Map(const Compare& comp) : __gnu_pbds::tree<Key, Value, Compare, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(comp) {}
+struct Map : pbds_map<Key, Value, Compare> {
+    Map() : pbds_map<Key, Value, Compare>() {}
+    explicit Map(const Compare& comp) : pbds_map<Key, Value, Compare>(comp) {}
     template <typename It>
-    Map(It first, It last, const Compare& comp = Compare()) : __gnu_pbds::tree<Key, Value, Compare, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(first, last, comp) {}
-    Map(const Map& other) : __gnu_pbds::tree<Key, Value, Compare, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(other) {}
-    Map(Map&& other) : __gnu_pbds::tree<Key, Value, Compare, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(std::move(other)) {}
-    Map(std::initializer_list<std::pair<Key, Value>> init, const Compare& comp = Compare()) : __gnu_pbds::tree<Key, Value, Compare, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(init, comp) {}
+    Map(It first, It last, const Compare& comp = Compare()) : pbds_map<Key, Value, Compare>(first, last, comp) {}
+    Map(const pbds_map<Key, Value, Compare>& other) : pbds_map<Key, Value, Compare>(other) {}
+    Map(const std::map<Key, Value, Compare>& other) : pbds_map<Key, Value, Compare>(other.begin(), other.end()) {}
+    Map(pbds_map<Key, Value, Compare>&& other) : pbds_map<Key, Value, Compare>(std::move(other)) {}
+    Map(std::initializer_list<std::pair<Key, Value>> init, const Compare& comp = Compare()) : pbds_map<Key, Value, Compare>(init, comp) {}
     typename Map::const_iterator cbegin() const { return this->begin(); }
     typename Map::const_iterator cend() const { return this->end(); }
     typename Map::const_reverse_iterator crbegin() const { return this->rbegin(); }
@@ -37,7 +41,7 @@ struct Map : __gnu_pbds::tree<Key, Value, Compare, __gnu_pbds::rb_tree_tag, __gn
         return it->second;
     }
     template <typename K>
-    std::size_t count(const K& x) const { return this->find(x) != this->end(); }
+    size_t count(const K& x) const { return this->find(x) != this->end(); }
     decltype(Compare()) key_comp() const { return Compare(); }
     template <typename... Args>
     std::pair<typename Map::iterator, bool> emplace(Args&&... args) {
@@ -64,14 +68,18 @@ namespace _map_util {
     };
 }
 template <typename Key, typename Value, typename Compare = std::less<Key>>
-struct MultiMap : __gnu_pbds::tree<Key, Value, _map_util::CompareEqual<Key, Compare>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update> {
-    MultiMap() : __gnu_pbds::tree<Key, Value, _map_util::CompareEqual<Key, Compare>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>() {}
-    explicit MultiMap(const Compare& comp) : __gnu_pbds::tree<Key, Value, _map_util::CompareEqual<Key, Compare>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(comp) {}
+using pbds_multimap = __gnu_pbds::tree<Key, Value, _map_util::CompareEqual<Key, Compare>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>;
+
+template <typename Key, typename Value, typename Compare = std::less<Key>>
+struct MultiMap : pbds_multimap<Key, Value, Compare> {
+    MultiMap() : pbds_multimap<Key, Value, Compare>() {}
+    explicit MultiMap(const Compare& comp) : pbds_multimap<Key, Value, Compare>(comp) {}
     template <typename It>
-    MultiMap(It first, It last, const Compare& comp = Compare()) : __gnu_pbds::tree<Key, Value, _map_util::CompareEqual<Key, Compare>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(first, last, comp) {}
-    MultiMap(const MultiMap& other) : __gnu_pbds::tree<Key, Value, _map_util::CompareEqual<Key, Compare>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(other) {}
-    MultiMap(MultiMap&& other) : __gnu_pbds::tree<Key, Value, _map_util::CompareEqual<Key, Compare>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(std::move(other)) {}
-    MultiMap(std::initializer_list<std::pair<Key, Value>> init, const Compare& comp = Compare()) : __gnu_pbds::tree<Key, Value, _map_util::CompareEqual<Key, Compare>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(init, comp) {}
+    MultiMap(It first, It last, const Compare& comp = Compare()) : pbds_multimap<Key, Value, Compare>(first, last, comp) {}
+    MultiMap(const pbds_multimap<Key, Value, Compare>& other) : pbds_multimap<Key, Value, Compare>(other) {}
+    MultiMap(const std::multimap<Key, Value, Compare>& other) : pbds_multimap<Key, Value, Compare>(other.begin(), other.end()) {}
+    MultiMap(pbds_multimap<Key, Value, Compare>&& other) : pbds_multimap<Key, Value, Compare>(std::move(other)) {}
+    MultiMap(std::initializer_list<std::pair<Key, Value>> init, const Compare& comp = Compare()) : pbds_multimap<Key, Value, Compare>(init, comp) {}
     typename MultiMap::const_iterator cbegin() const { return this->begin(); }
     typename MultiMap::const_iterator cend() const { return this->end(); }
     typename MultiMap::const_reverse_iterator crbegin() const { return this->rbegin(); }
@@ -95,7 +103,7 @@ struct MultiMap : __gnu_pbds::tree<Key, Value, _map_util::CompareEqual<Key, Comp
         return it->second;
     }
     template <typename K>
-    std::size_t count(const K& x) const {
+    size_t count(const K& x) const {
         auto range = equal_range(x);
         return std::distance(range.first, range.second);
     }

@@ -8,14 +8,18 @@
 #include "vector.hpp"
 
 template <typename T, typename Hash = std::hash<T>, typename KeyEqual = std::equal_to<T>>
-struct UnorderedSet : public __gnu_pbds::gp_hash_table<T, __gnu_pbds::null_type, Hash, KeyEqual> {
-    UnorderedSet() : __gnu_pbds::gp_hash_table<T, __gnu_pbds::null_type, Hash, KeyEqual>() {}
-    explicit UnorderedSet(std::size_t bucket_count, const Hash& hash = Hash(), const KeyEqual& equal = KeyEqual()) : __gnu_pbds::gp_hash_table<T, __gnu_pbds::null_type, Hash, KeyEqual>(bucket_count, hash, equal) {}
+using pbds_unordered_set = __gnu_pbds::gp_hash_table<T, __gnu_pbds::null_type, Hash, KeyEqual>;
+
+template <typename T, typename Hash = std::hash<T>, typename KeyEqual = std::equal_to<T>>
+struct UnorderedSet : public pbds_unordered_set<T, Hash, KeyEqual> {
+    UnorderedSet() : pbds_unordered_set<T, Hash, KeyEqual>() {}
+    explicit UnorderedSet(std::size_t bucket_count, const Hash& hash = Hash(), const KeyEqual& equal = KeyEqual()) : pbds_unordered_set<T, Hash, KeyEqual>(bucket_count, hash, equal) {}
     template <typename InputIt>
-    UnorderedSet(InputIt first, InputIt last, std::size_t bucket_count = 1, const Hash& hash = Hash(), const KeyEqual& equal = KeyEqual()) : __gnu_pbds::gp_hash_table<T, __gnu_pbds::null_type, Hash, KeyEqual>(first, last, bucket_count, hash, equal) {}
-    UnorderedSet(const UnorderedSet& other) : __gnu_pbds::gp_hash_table<T, __gnu_pbds::null_type, Hash, KeyEqual>(other) {}
-    UnorderedSet(UnorderedSet&& other) : __gnu_pbds::gp_hash_table<T, __gnu_pbds::null_type, Hash, KeyEqual>(std::move(other)) {}
-    UnorderedSet(std::initializer_list<T> init, std::size_t bucket_count = 1, const Hash& hash = Hash(), const KeyEqual& equal = KeyEqual()) : __gnu_pbds::gp_hash_table<T, __gnu_pbds::null_type, Hash, KeyEqual>(init, bucket_count, hash, equal) {}
+    UnorderedSet(InputIt first, InputIt last, std::size_t bucket_count = 1, const Hash& hash = Hash(), const KeyEqual& equal = KeyEqual()) : pbds_unordered_set<T, Hash, KeyEqual>(first, last, bucket_count, hash, equal) {}
+    UnorderedSet(const pbds_unordered_set<T, Hash, KeyEqual>& other) : pbds_unordered_set<T, Hash, KeyEqual>(other) {}
+    UnorderedSet(const std::unordered_set<T, Hash, KeyEqual>& other) : pbds_unordered_set<T, Hash, KeyEqual>(other.begin(), other.end()) {}
+    UnorderedSet(pbds_unordered_set<T, Hash, KeyEqual>&& other) : pbds_unordered_set<T, Hash, KeyEqual>(std::move(other)) {}
+    UnorderedSet(std::initializer_list<T> init, std::size_t bucket_count = 1, const Hash& hash = Hash(), const KeyEqual& equal = KeyEqual()) : pbds_unordered_set<T, Hash, KeyEqual>(init, bucket_count, hash, equal) {}
     typename UnorderedSet::const_iterator cbegin() const { return this->begin(); }
     typename UnorderedSet::const_iterator cend() const { return this->end(); }
     KeyEqual key_eq() const { return KeyEqual(); }
@@ -38,8 +42,8 @@ struct UnorderedMultiSet : std::unordered_multiset<T, Hash, KeyEqual> {
     explicit UnorderedMultiSet(std::size_t bucket_count, const Hash& hash = Hash(), const KeyEqual& equal = KeyEqual()) : std::unordered_multiset<T, Hash, KeyEqual>(bucket_count, hash, equal) {}
     template <typename InputIt>
     UnorderedMultiSet(InputIt first, InputIt last, std::size_t bucket_count = 1, const Hash& hash = Hash(), const KeyEqual& equal = KeyEqual()) : std::unordered_multiset<T, Hash, KeyEqual>(first, last, bucket_count, hash, equal) {}
-    UnorderedMultiSet(const UnorderedMultiSet& other) : std::unordered_multiset<T, Hash, KeyEqual>(other) {}
-    UnorderedMultiSet(UnorderedMultiSet&& other) : std::unordered_multiset<T, Hash, KeyEqual>(std::move(other)) {}
+    UnorderedMultiSet(const std::unordered_set<T, Hash, KeyEqual>& other) : std::unordered_multiset<T, Hash, KeyEqual>(other) {}
+    UnorderedMultiSet(std::unordered_set<T, Hash, KeyEqual>&& other) : std::unordered_multiset<T, Hash, KeyEqual>(std::move(other)) {}
     UnorderedMultiSet(std::initializer_list<T> init, std::size_t bucket_count = 1, const Hash& hash = Hash(), const KeyEqual& equal = KeyEqual()) : std::unordered_multiset<T, Hash, KeyEqual>(init, bucket_count, hash, equal) {}
     friend std::ostream& operator<<(std::ostream& os, const UnorderedMultiSet& set) {
         for (auto it = set.begin(); it != set.end(); ++it) {

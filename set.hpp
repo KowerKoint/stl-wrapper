@@ -5,15 +5,20 @@
 #include <ext/pb_ds/tree_policy.hpp>
 #include "vector.hpp"
 
+
 template <typename T, typename Compare = std::less<T>>
-struct Set : public __gnu_pbds::tree<T, __gnu_pbds::null_type, Compare, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update> {
-    Set() : __gnu_pbds::tree<T, __gnu_pbds::null_type, Compare, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>() {}
-    explicit Set(const Compare& comp) : __gnu_pbds::tree<T, __gnu_pbds::null_type, Compare, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(comp) {}
+using pbds_set = __gnu_pbds::tree<T, __gnu_pbds::null_type, Compare, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>;
+
+template <typename T, typename Compare = std::less<T>>
+struct Set : public pbds_set<T, Compare> {
+    Set() : pbds_set<T, Compare>() {}
+    explicit Set(const Compare& comp) : pbds_set<T, Compare>(comp) {}
     template <typename It>
-    Set(It first, It last, const Compare& comp = Compare()) : __gnu_pbds::tree<T, __gnu_pbds::null_type, Compare, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(first, last, comp) {}
-    Set(const Set& other) : __gnu_pbds::tree<T, __gnu_pbds::null_type, Compare, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(other) {}
-    Set(Set&& other) : __gnu_pbds::tree<T, __gnu_pbds::null_type, Compare, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(std::move(other)) {}
-    Set(std::initializer_list<T> init, const Compare& comp = Compare()) : __gnu_pbds::tree<T, __gnu_pbds::null_type, Compare, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(init, comp) {}
+    Set(It first, It last, const Compare& comp = Compare()) : pbds_set<T, Compare>(first, last, comp) {}
+    Set(const pbds_set<T, Compare>& other) : pbds_set<T, Compare>(other) {}
+    Set(const std::set<T, Compare>& other) : pbds_set<T, Compare>(other.begin(), other.end()) {}
+    Set(pbds_set<T, Compare>&& other) : pbds_set<T, Compare>(std::move(other)) {}
+    Set(std::initializer_list<T> init, const Compare& comp = Compare()) : pbds_set<T, Compare>(init, comp) {}
     typename Set::const_iterator cbegin() const { return this->begin(); }
     typename Set::const_iterator cend() const { return this->end(); }
     typename Set::const_reverse_iterator crbegin() const { return this->rbegin(); }
@@ -27,7 +32,7 @@ struct Set : public __gnu_pbds::tree<T, __gnu_pbds::null_type, Compare, __gnu_pb
         return std::make_pair(lower_bound(value), upper_bound(value));
     }
     template <typename K>
-    std::size_t count(const K& x) const { return this->find(x) != this->end(); }
+    size_t count(const K& x) const { return this->find(x) != this->end(); }
     decltype(Compare()) key_comp() const { return Compare(); }
     template <typename... Args>
     std::pair<typename Set::iterator, bool> emplace(Args&&... args) {
@@ -42,6 +47,7 @@ struct Set : public __gnu_pbds::tree<T, __gnu_pbds::null_type, Compare, __gnu_pb
         return os << vector;
     }
 };
+
 namespace _set_util {
     template <typename T, typename Compare>
     struct CompareEqual {
@@ -51,14 +57,18 @@ namespace _set_util {
     };
 }
 template <typename T, typename Compare = std::less<T>>
-struct MultiSet : public __gnu_pbds::tree<T, __gnu_pbds::null_type, _set_util::CompareEqual<T, Compare>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update> {
-    MultiSet() : __gnu_pbds::tree<T, __gnu_pbds::null_type, _set_util::CompareEqual<T, Compare>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>() {}
-    explicit MultiSet(const Compare& comp) : __gnu_pbds::tree<T, __gnu_pbds::null_type, _set_util::CompareEqual<T, Compare>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(comp) {}
+using pbds_multiset = __gnu_pbds::tree<T, __gnu_pbds::null_type, _set_util::CompareEqual<T, Compare>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>;
+
+template <typename T, typename Compare = std::less<T>>
+struct MultiSet : public pbds_multiset<T, Compare> {
+    MultiSet() : pbds_multiset<T, Compare>() {}
+    explicit MultiSet(const Compare& comp) : pbds_multiset<T, Compare>(comp) {}
     template <typename It>
-    MultiSet(It first, It last, const Compare& comp = Compare()) : __gnu_pbds::tree<T, __gnu_pbds::null_type, _set_util::CompareEqual<T, Compare>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(first, last, comp) {}
-    MultiSet(const MultiSet& other) : __gnu_pbds::tree<T, __gnu_pbds::null_type, _set_util::CompareEqual<T, Compare>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(other) {}
-    MultiSet(MultiSet&& other) : __gnu_pbds::tree<T, __gnu_pbds::null_type, _set_util::CompareEqual<T, Compare>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(std::move(other)) {}
-    MultiSet(std::initializer_list<T> init, const Compare& comp = Compare()) : __gnu_pbds::tree<T, __gnu_pbds::null_type, _set_util::CompareEqual<T, Compare>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>(init, comp) {}
+    MultiSet(It first, It last, const Compare& comp = Compare()) : pbds_multiset<T, Compare>(first, last, comp) {}
+    MultiSet(const pbds_multiset<T, Compare>& other) : pbds_multiset<T, Compare>(other) {}
+    MultiSet(const std::multiset<T, Compare>& other) : pbds_multiset<T, Compare>(other.begin(), other.end()) {}
+    MultiSet(pbds_multiset<T, Compare>&& other) : pbds_multiset<T, Compare>(std::move(other)) {}
+    MultiSet(std::initializer_list<T> init, const Compare& comp = Compare()) : pbds_multiset<T, Compare>(init, comp) {}
     typename MultiSet::const_iterator cbegin() const { return this->begin(); }
     typename MultiSet::const_iterator cend() const { return this->end(); }
     typename MultiSet::const_reverse_iterator crbegin() const { return this->rbegin(); }
@@ -72,7 +82,7 @@ struct MultiSet : public __gnu_pbds::tree<T, __gnu_pbds::null_type, _set_util::C
         return std::make_pair(lower_bound(value), upper_bound(value));
     }
     template <typename K>
-    std::size_t count(const K& x) const {
+    size_t count(const K& x) const {
         auto range = equal_range(x);
         return std::distance(range.first, range.second);
     }
